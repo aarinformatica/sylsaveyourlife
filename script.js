@@ -2922,3 +2922,281 @@ function escapeHTML(value) {
   });
 
 }
+/* =========================================================
+   SYL — NOTIFICAÇÕES NATIVAS DO NAVEGADOR
+========================================================= */
+
+const SYLNotifications = (() => {
+
+    const STORAGE_KEY = "syl-browser-notifications";
+
+    const elements = {
+        button: document.getElementById("enableNotifications"),
+        status: document.getElementById("notificationStatus"),
+        checkbox: document.getElementById("browserNotifications")
+    };
+
+    let enabled = localStorage.getItem(STORAGE_KEY) !== "false";
+
+    const supported = () => {
+        return "Notification" in window;
+    };
+
+    function updateStatus() {
+
+        if (!elements.status) return;
+
+        if (!supported()) {
+            elements.status.textContent = "Não suportadas";
+            elements.status.className = "denied";
+            return;
+        }
+
+        const permission = Notification.permission;
+
+        elements.status.className = "";
+
+        if (permission === "granted") {
+            elements.status.textContent = "Autorizadas";
+            elements.status.classList.add("active");
+
+            if (elements.button) {
+                elements.button.innerHTML =
+                    '<i class="fa-solid fa-check"></i> Enviar notificação de teste';
+            }
+
+        } else if (permission === "denied") {
+            elements.status.textContent = "Bloqueadas";
+            elements.status.classList.add("denied");
+
+            if (elements.button) {
+                elements.button.innerHTML =
+                    '<i class="fa-solid fa-lock"></i> Permissão bloqueada';
+            }
+
+        } else {
+            elements.status.textContent = "Não ativadas";
+
+            if (elements.button) {
+                elements.button.innerHTML =
+                    '<i class="fa-solid fa-bell"></i> Ativar notificações';
+            }
+        }
+
+        if (elements.checkbox) {
+            elements.checkbox.checked = enabled;
+        }
+    }
+
+    async function requestPermission() {
+
+        if (!supported()) {
+            showToast("Seu navegador não suporta notificações.");
+            return;
+        }
+
+        if (!window.isSecureContext) {
+            showToast("As notificações exigem uma conexão HTTPS.");
+            return;
+        }
+
+        if (Notification.permission === "denied") {
+            showToast(
+                "As notificações estão bloqueadas nas permissões do navegador."
+            );
+            updateStatus();
+            return;
+        }
+
+        try {
+
+            const permission = await Notification.requestPermission();
+
+            if (permission === "granted") {
+
+                enabled = true;
+
+                localStorage.setItem(STORAGE_KEY, "true");
+
+                if (elements.checkbox) {
+                    elements.checkbox.checked = true;
+                }
+
+                updateStatus();
+
+                await send(
+                    "SYL — Safe Your Life",
+                    "Notificações ativadas com sucesso! Você receberá alertas importantes.",
+                    {
+                        force: true,
+                        tag: "syl-welcome"
+                    }
+                );
+
+                showToast("Notificações ativadas!");
+
+            } else {
+                updateStatus();
+                showToast("Permissão de notificações não concedida.");
+            }
+
+        } catch (error) {
+            console.error("Erro ao solicitar notificações:", error);
+            showToast("Não foi possível ativar as notificações.");
+        }
+    }
+
+    async function send(title, body, options = {}) {
+
+        if (!supported()) return false;
+
+        if (!enabled && !options.force) return false;
+
+        if (Notification.permission !== "granted") return false;
+
+        const notificationOptions = {
+            body,
+            icon: "https://raw.githubusercontent.com/aarinformatica/incuindopushsyl/refs/heads/main/newlogosyl.png",
+            badge: "https://raw.githubusercontent.com/aarinformatica/incuindopushsyl/refs/heads/main/newlogosyl.png",
+            tag: options.tag || "syl-notification",
+            renotify: false,
+            data: {
+                url: window.location.href
+            }
+        };
+
+        try {
+
+            /*
+             * Se já existir um Service Worker ativo,
+             * utiliza notificações persistentes.
+             */
+
+            if ("serviceWorker" in navigator) {
+
+                const registration =
+                    navigator.serviceWorker.controller
+                        ? await navigator.serviceWorker.getRegistration()
+                        : null;
+
+                if (registration && registration.active) {
+
+                    await registration.showNotification(
+                        title,
+                        notificationOptions
+                    );
+
+                    return true;
+                }
+            }
+
+            /*
+             * Fallback para navegadores desktop.
+             * Em dispositivos móveis, um Service Worker
+             * será necessário.
+             */
+
+            const notification = new Notification(
+                title,
+                notificationOptions
+            );
+
+            notification.onclick = () => {
+                window.focus();
+                notification.close();
+            };
+
+            return true;
+
+        } catch (error) {
+
+            console.warn(
+                "Não foi possível exibir a notificação:",
+                error
+            );
+
+            return false;
+        }
+    }
+
+    function notifyNetworkEvent(name) {
+
+        if (!document.hidden) return;
+
+        send(
+            "SYL — Novo usuário",
+            `${name} entrou na rede de segurança.`,
+            {
+                tag: `syl-user-${name}`
+            }
+        );
+    }
+
+    function notifyNearbyUser(name, distance) {
+
+        if (!document.hidden) return;
+
+        const roundedDistance = Math.round(distance);
+
+        send(
+            "SYL — Alerta de proximidade",
+            `${name} está a aproximadamente ${roundedDistance} metros de você.`,
+            {
+                tag: `syl-nearby-${name}`
+            }
+        );
+    }
+
+    function setEnabled(value) {
+
+        enabled = Boolean(value);
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            enabled ? "true" : "false"
+        );
+
+        if (elements.checkbox) {
+            elements.checkbox.checked = enabled;
+        }
+
+        updateStatus();
+    }
+
+    function initialize() {
+
+        if (elements.button) {
+            elements.button.addEventListener(
+                "click",
+                requestPermission
+            );
+        }
+
+        if (elements.checkbox) {
+            elements.checkbox.checked = enabled;
+
+            elements.checkbox.addEventListener(
+                "change",
+                event => {
+                    setEnabled(event.target.checked);
+                }
+            );
+        }
+
+        updateStatus();
+    }
+
+    return {
+        initialize,
+        requestPermission,
+        send,
+        notifyNetworkEvent,
+        notifyNearbyUser,
+        updateStatus,
+        setEnabled
+    };
+
+})();
+
+/* Inicialização sem solicitar permissão automaticamente. */
+SYLNotifications.initialize();
