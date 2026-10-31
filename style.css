@@ -2344,3 +2344,129 @@ select:focus-visible {
     transition-duration: .01ms !important;
   }
 }
+/* =========================================
+   NOTIFICAÇÕES DO NAVEGADOR — SYL
+========================================= */
+
+.notification-group {
+    margin-top: 18px;
+}
+
+.notification-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.notification-heading > i {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(22, 137, 237, 0.12);
+    color: #1689ed;
+    font-size: 18px;
+}
+
+.notification-heading strong,
+.notification-heading small {
+    display: block;
+}
+
+.notification-heading strong {
+    font-size: 14px;
+    color: var(--text-primary, #172b4d);
+}
+
+.notification-heading small {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-secondary, #718096);
+}
+
+.notification-card {
+    padding: 16px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 14px;
+    background: var(--card-background, #ffffff);
+}
+
+.notification-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--text-secondary, #718096);
+}
+
+#notificationStatus {
+    font-weight: 700;
+    color: #d97706;
+}
+
+#notificationStatus.active {
+    color: #16a34a;
+}
+
+#notificationStatus.denied {
+    color: #dc2626;
+}
+
+.notification-enable-button {
+    width: 100%;
+    min-height: 44px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0a4da2, #1689ed);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s, opacity .2s;
+}
+
+.notification-enable-button:hover {
+    transform: translateY(-2px);
+    opacity: .92;
+}
+
+.notification-enable-button:active {
+    transform: scale(.98);
+}
+
+.notification-enable-button i {
+    margin-right: 7px;
+}
+
+.notification-card .setting-check {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.notification-card .setting-check input {
+    accent-color: #1689ed;
+}
+
+.notification-description {
+    margin: 12px 0 0;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-secondary, #718096);
+}
+
+body.dark-theme .notification-card {
+    background: var(--card-background, #1e293b);
+    border-color: var(--border-color, #334155);
+}
+
+body.dark-theme .notification-heading strong {
+    color: var(--text-primary, #f1f5f9);
+}
