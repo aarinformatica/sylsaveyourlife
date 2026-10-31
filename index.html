@@ -1,0 +1,1009 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a4da2">
+
+  <title>SYL — Safe Your Life</title>
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- EFEITOS DE FUNDO -->
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="electric-line electric-line-one"></div>
+  <div class="electric-line electric-line-two"></div>
+
+  <!-- =====================================================
+       TELA DE ENTRADA
+  ====================================================== -->
+
+  <main id="loginScreen" class="login-screen">
+
+    <section class="login-card">
+
+      <div class="brand-icon">
+        <img
+          src="https://raw.githubusercontent.com/aarinformatica/incuindopushsyl/refs/heads/main/newlogosyl.png"
+          alt="Logotipo SYL">
+      </div>
+
+      <div class="brand-title">
+        <h1>SYL</h1>
+        <span>SAFE YOUR LIFE</span>
+      </div>
+
+      <div class="login-heading">
+        <h2>Sua segurança começa aqui.</h2>
+        <p>Conectando pessoas, protegendo caminhos.</p>
+      </div>
+
+      <form id="entryForm">
+
+        <label for="userNameInput">
+          Como podemos chamar você?
+        </label>
+
+        <div class="input-wrap">
+          <i class="fa-solid fa-user"></i>
+
+          <input
+            id="userNameInput"
+            type="text"
+            maxlength="30"
+            placeholder="Digite seu nome"
+            autocomplete="name"
+            required>
+        </div>
+
+        <div class="mode-heading">
+          <span>Escolha seu módulo</span>
+          <small>Você poderá alterar isso ao entrar novamente.</small>
+        </div>
+
+        <div class="mode-options">
+
+          <label class="mode-option">
+            <input
+              type="radio"
+              name="userMode"
+              value="pedestre"
+              checked>
+
+            <span class="mode-card pedestrian-card">
+              <i class="fa-solid fa-person-walking"></i>
+              <strong>Pedestre</strong>
+              <small>Segurança durante seus trajetos</small>
+            </span>
+          </label>
+
+          <label class="mode-option">
+            <input
+              type="radio"
+              name="userMode"
+              value="motorista">
+
+            <span class="mode-card driver-card">
+              <i class="fa-solid fa-car-side"></i>
+              <strong>Motorista</strong>
+              <small>Mobilidade e proteção no trânsito</small>
+            </span>
+          </label>
+
+        </div>
+
+        <!-- DADOS DO VEÍCULO -->
+
+        <div id="vehicleFields" class="vehicle-fields">
+
+          <label for="vehicleModel">
+            Modelo do veículo
+          </label>
+
+          <div class="input-wrap">
+            <i class="fa-solid fa-car"></i>
+
+            <input
+              id="vehicleModel"
+              type="text"
+              maxlength="50"
+              placeholder="Ex.: Honda Civic"
+              disabled>
+          </div>
+
+          <label class="electric-check">
+            <input
+              id="electricVehicle"
+              type="checkbox"
+              disabled>
+
+            <span>
+              <i class="fa-solid fa-bolt"></i>
+              Meu veículo é elétrico ou híbrido
+            </span>
+          </label>
+
+        </div>
+
+        <button
+          id="loginButton"
+          class="primary-button"
+          type="submit">
+
+          <span>Entrar no SYL</span>
+          <i class="fa-solid fa-arrow-right"></i>
+
+        </button>
+
+      </form>
+
+      <div class="login-security">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Conexão de segurança SYL</span>
+        <span class="security-light"></span>
+      </div>
+
+    </section>
+
+    <footer class="login-footer">
+      2026 © SYL — Safe Your Life. Todos os direitos reservados.
+    </footer>
+
+  </main>
+
+
+  <!-- =====================================================
+       APLICATIVO PRINCIPAL
+  ====================================================== -->
+
+  <div id="appScreen" class="app-screen hidden">
+
+    <!-- BARRA SUPERIOR -->
+
+    <header class="topbar">
+
+      <div class="topbar-brand">
+
+        <img
+          src="https://raw.githubusercontent.com/aarinformatica/incuindopushsyl/refs/heads/main/newlogosyl.png"
+          alt="SYL">
+
+        <div>
+          <strong>SYL</strong>
+          <small>SAFE YOUR LIFE</small>
+        </div>
+
+      </div>
+
+      <div class="topbar-center">
+        <span class="topbar-live-dot"></span>
+        <span id="connectionStatus">Aguardando conexão</span>
+      </div>
+
+      <div class="topbar-actions">
+
+        <button
+          id="settingsButton"
+          class="topbar-button"
+          type="button"
+          title="Configurações">
+
+          <i class="fa-solid fa-sliders"></i>
+
+        </button>
+
+        <button
+          id="exitButton"
+          class="topbar-button exit-button"
+          type="button"
+          title="Sair">
+
+          <i class="fa-solid fa-right-from-bracket"></i>
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- PAINEL PRINCIPAL -->
+
+    <main class="dashboard">
+
+      <!-- BOAS-VINDAS -->
+
+      <section class="dashboard-heading">
+
+        <div>
+          <span class="eyebrow">
+            CENTRAL DE MOBILIDADE E SEGURANÇA
+          </span>
+
+          <h1>
+            Olá,
+            <span id="userDisplay">Usuário</span>
+            <span class="heading-wave">.</span>
+          </h1>
+
+          <p id="moduleDescription">
+            Sua rede de proteção está pronta para acompanhar você.
+          </p>
+        </div>
+
+        <div
+          id="moduleBadge"
+          class="module-badge pedestrian-badge">
+
+          <span class="badge-icon">
+            <i class="fa-solid fa-person-walking"></i>
+          </span>
+
+          <span>
+            <small>MÓDULO ATIVO</small>
+            <strong>Pedestre</strong>
+          </span>
+
+          <span class="badge-live"></span>
+
+        </div>
+
+      </section>
+
+
+      <!-- MÓDULO PEDESTRE -->
+
+      <section
+        id="pedestrianModule"
+        class="mode-banner pedestrian-banner">
+
+        <div class="banner-art">
+
+          <div class="banner-orbit orbit-one"></div>
+          <div class="banner-orbit orbit-two"></div>
+
+          <i class="fa-solid fa-person-walking"></i>
+
+        </div>
+
+        <div class="banner-content">
+
+          <span>PROTEÇÃO PESSOAL</span>
+
+          <h2>Seus caminhos, mais seguros.</h2>
+
+          <p>
+            Acompanhe sua posição e visualize pessoas conectadas
+            à rede SYL ao seu redor.
+          </p>
+
+        </div>
+
+        <div class="banner-status">
+          <span class="banner-status-dot"></span>
+          MONITORAMENTO ATIVO
+        </div>
+
+      </section>
+
+
+      <!-- MÓDULO MOTORISTA -->
+
+      <section
+        id="driverModule"
+        class="mode-banner driver-banner hidden">
+
+        <div class="banner-art driver-art">
+
+          <div class="banner-orbit orbit-one"></div>
+          <div class="banner-orbit orbit-two"></div>
+
+          <i class="fa-solid fa-car-side"></i>
+          <i class="fa-solid fa-bolt banner-bolt"></i>
+
+        </div>
+
+        <div class="banner-content">
+
+          <span>CENTRAL DO MOTORISTA</span>
+
+          <h2>Mais atenção em cada percurso.</h2>
+
+          <p id="driverVehicleDescription">
+            Acompanhe sua posição e os usuários próximos no trânsito.
+          </p>
+
+        </div>
+
+        <div class="banner-status driver-banner-status">
+          <span class="banner-status-dot"></span>
+          MODO MOTORISTA ATIVO
+        </div>
+
+      </section>
+
+
+      <!-- INDICADORES -->
+
+      <section class="overview-grid">
+
+        <!-- GPS -->
+
+        <article class="overview-card gps-card">
+
+          <div class="overview-top">
+
+            <span class="overview-icon gps-icon">
+              <i class="fa-solid fa-location-crosshairs"></i>
+            </span>
+
+            <span class="overview-label">
+              LOCALIZAÇÃO GPS
+            </span>
+
+            <span id="gpsIndicator" class="mini-indicator"></span>
+
+          </div>
+
+          <strong id="gpsStatus">
+            Aguardando GPS
+          </strong>
+
+          <small id="gpsAccuracy">
+            Precisão ainda não disponível
+          </small>
+
+        </article>
+
+
+        <!-- USUÁRIOS PRÓXIMOS -->
+
+        <article class="overview-card users-card">
+
+          <div class="overview-top">
+
+            <span class="overview-icon users-icon">
+              <i class="fa-solid fa-users"></i>
+            </span>
+
+            <span class="overview-label">
+              NA SUA ÁREA
+            </span>
+
+            <span class="card-live">
+              AO VIVO
+            </span>
+
+          </div>
+
+          <strong id="nearbyCount">0</strong>
+
+          <small>
+            Usuários dentro do raio selecionado
+          </small>
+
+        </article>
+
+
+        <!-- PROTEÇÃO -->
+
+        <article class="overview-card safety-card">
+
+          <div class="overview-top">
+
+            <span class="overview-icon safety-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </span>
+
+            <span class="overview-label">
+              PROTEÇÃO SYL
+            </span>
+
+            <span class="safety-check">
+              <i class="fa-solid fa-check"></i>
+            </span>
+
+          </div>
+
+          <strong id="protectionStatus">Ativa</strong>
+
+          <small>
+            Monitoramento deste dispositivo
+          </small>
+
+        </article>
+
+      </section>
+
+
+      <!-- ÁREA DE TRABALHO -->
+
+      <section class="workspace-grid">
+
+
+        <!-- MAPA -->
+
+        <div class="map-panel">
+
+          <div class="panel-heading">
+
+            <div>
+              <span class="eyebrow">
+                REDE SYL EM TEMPO REAL
+              </span>
+
+              <h2>Mapa de segurança</h2>
+
+              <p>
+                Visualização dos usuários conectados próximos a você.
+              </p>
+            </div>
+
+            <button
+              id="locateButton"
+              class="locate-button"
+              type="button">
+
+              <i class="fa-solid fa-crosshairs"></i>
+              <span>Centralizar</span>
+
+            </button>
+
+          </div>
+
+
+          <!-- CONTAINER DO LEAFLET -->
+
+          <div class="map-container">
+
+            <div id="map"></div>
+
+            <div class="map-floating-status">
+              <span class="map-status-pulse"></span>
+              <span id="mapStatusText">MAPA ATIVO</span>
+            </div>
+
+
+            <!-- LEGENDA -->
+
+            <div class="map-legend">
+
+              <div>
+                <span class="legend-marker pedestrian-legend">
+                  <i class="fa-solid fa-person-walking"></i>
+                </span>
+                <span>Pedestre</span>
+              </div>
+
+              <div>
+                <span class="legend-marker driver-legend">
+                  <i class="fa-solid fa-car-side"></i>
+                </span>
+                <span>Motorista</span>
+              </div>
+
+              <div>
+                <span class="legend-marker electric-legend">
+                  <i class="fa-solid fa-car-side"></i>
+                  <i class="fa-solid fa-bolt"></i>
+                </span>
+                <span>Elétrico</span>
+              </div>
+
+            </div>
+
+
+            <div class="map-bottom-label">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>CAMADA DE PROTEÇÃO SYL</span>
+            </div>
+
+          </div>
+
+
+          <!-- RODAPÉ DO MAPA -->
+
+          <div class="map-footer">
+
+            <div>
+              <i class="fa-solid fa-circle-info"></i>
+
+              <span>
+                Os marcadores representam usuários que compartilharam sua localização.
+              </span>
+            </div>
+
+            <span id="lastUpdate">
+              Aguardando atualização
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- PAINEL LATERAL -->
+
+        <aside class="side-panel">
+
+
+          <!-- PESSOAS PRÓXIMAS -->
+
+          <section class="side-card nearby-card">
+
+            <div class="side-card-heading">
+
+              <div>
+                <span class="eyebrow">
+                  COMUNIDADE SYL
+                </span>
+
+                <h2>Ao seu redor</h2>
+              </div>
+
+              <span class="nearby-live">
+                <span></span>
+                LIVE
+              </span>
+
+            </div>
+
+
+            <div class="nearby-summary">
+              <strong id="nearbySummaryCount">0</strong>
+              <span>pessoas próximas</span>
+            </div>
+
+
+            <div id="nearbyUsers" class="nearby-users">
+
+              <div class="empty-users">
+
+                <span class="empty-users-icon">
+                  <i class="fa-solid fa-satellite-dish"></i>
+                </span>
+
+                <strong>Ninguém por perto ainda</strong>
+
+                <p>
+                  Quando outros usuários entrarem na rede,
+                  aparecerão aqui.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- DADOS DO VEÍCULO -->
+
+          <section
+            class="side-card vehicle-card hidden"
+            id="vehicleCard">
+
+            <div class="side-card-heading">
+
+              <div>
+                <span class="eyebrow">SEU VEÍCULO</span>
+                <h2>Dados do motorista</h2>
+              </div>
+
+              <span class="vehicle-card-icon">
+                <i class="fa-solid fa-car-side"></i>
+              </span>
+
+            </div>
+
+            <strong id="driverVehicleName">
+              Veículo não informado
+            </strong>
+
+            <div id="electricStatus" class="vehicle-type">
+              <i class="fa-solid fa-gas-pump"></i>
+              <span>Veículo convencional</span>
+            </div>
+
+          </section>
+
+
+          <!-- DICA DE SEGURANÇA -->
+
+          <section class="security-tip">
+
+            <div class="tip-icon">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+
+            <div>
+              <strong>Segurança conectada</strong>
+
+              <p>
+                O SYL mantém sua rede atualizada enquanto você
+                compartilha sua localização.
+              </p>
+            </div>
+
+          </section>
+
+        </aside>
+
+      </section>
+
+
+      <!-- RODAPÉ DO APLICATIVO -->
+
+      <footer class="dashboard-footer">
+
+        <div class="footer-brand">
+          <i class="fa-solid fa-shield-halved"></i>
+          <strong>SYL</strong>
+          <span>SAFE YOUR LIFE</span>
+        </div>
+
+        <span>
+          2026 © SYL — Todos os direitos reservados
+        </span>
+
+        <strong id="clock">--:--:--</strong>
+
+      </footer>
+
+    </main>
+
+
+    <!-- =================================================
+         NAVEGAÇÃO INFERIOR — MOBILE
+    ================================================== -->
+
+    <nav
+      class="mobile-bottom-nav"
+      id="mobileBottomNav"
+      aria-label="Navegação principal">
+
+      <button
+        type="button"
+        class="mobile-nav-item active"
+        data-mobile-tab="home"
+        aria-label="Início">
+
+        <i class="fa-solid fa-house"></i>
+        <span>Início</span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        data-mobile-tab="map"
+        aria-label="Mapa">
+
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Mapa</span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        data-mobile-tab="people"
+        aria-label="Pessoas próximas">
+
+        <i class="fa-solid fa-users"></i>
+        <span>Pessoas</span>
+
+        <small id="mobileNearbyBadge">0</small>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        data-mobile-tab="settings"
+        aria-label="Configurações">
+
+        <i class="fa-solid fa-sliders"></i>
+        <span>Config.</span>
+
+      </button>
+
+    </nav>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL DE CONFIGURAÇÕES
+  ====================================================== -->
+
+  <div id="settingsModal" class="modal hidden">
+
+    <div class="modal-card settings-card">
+
+      <button
+        class="modal-close"
+        type="button"
+        data-close="settingsModal"
+        aria-label="Fechar configurações">
+
+        <i class="fa-solid fa-xmark"></i>
+
+      </button>
+
+
+      <div class="modal-heading-icon">
+        <i class="fa-solid fa-sliders"></i>
+      </div>
+
+      <span class="eyebrow">PERSONALIZAÇÃO</span>
+
+      <h2>Configurações</h2>
+
+      <p>
+        Personalize a aparência e o comportamento da sua rede SYL.
+      </p>
+
+
+      <!-- TEMA -->
+
+      <div class="settings-group">
+
+        <label for="themeSelect">
+          Aparência do aplicativo
+        </label>
+
+        <select id="themeSelect">
+          <option value="light">Claro</option>
+          <option value="dark">Escuro</option>
+        </select>
+
+      </div>
+
+
+      <!-- COR DO MARCADOR -->
+
+      <div class="settings-group marker-settings">
+
+        <label>
+          Cor do meu marcador no mapa
+        </label>
+
+        <div class="marker-color-row">
+
+          <div class="color-preview" id="markerColorPreview">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <div class="color-picker-wrap">
+            <input
+              id="markerColor"
+              type="color"
+              value="#1689ed">
+
+            <span>Escolha sua cor</span>
+          </div>
+
+          <span id="markerColorHex">#1689ED</span>
+
+        </div>
+
+
+        <div class="color-presets">
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#1689ed"
+            style="--preset:#1689ed"
+            aria-label="Azul"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#ff8a24"
+            style="--preset:#ff8a24"
+            aria-label="Laranja"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#00bfa6"
+            style="--preset:#00bfa6"
+            aria-label="Verde"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#a855f7"
+            style="--preset:#a855f7"
+            aria-label="Roxo"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#ef476f"
+            style="--preset:#ef476f"
+            aria-label="Rosa"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#e0a800"
+            style="--preset:#e0a800"
+            aria-label="Amarelo"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#16a34a"
+            style="--preset:#16a34a"
+            aria-label="Verde escuro"></button>
+
+          <button
+            type="button"
+            class="color-preset"
+            data-color="#334155"
+            style="--preset:#334155"
+            aria-label="Cinza"></button>
+
+        </div>
+
+        <small class="settings-hint">
+          Sua cor será exibida no seu marcador.
+          O ícone continuará identificando seu módulo.
+        </small>
+
+      </div>
+
+
+      <!-- DISTÂNCIA DOS ALERTAS -->
+
+      <div class="settings-group">
+
+        <label for="alertDistance">
+          Raio para usuários próximos
+        </label>
+
+        <select id="alertDistance">
+          <option value="100">100 metros</option>
+          <option value="250">250 metros</option>
+          <option value="500" selected>500 metros</option>
+          <option value="1000">1 quilômetro</option>
+        </select>
+
+      </div>
+
+
+      <!-- ALERTAS SONOROS -->
+
+      <label class="setting-check">
+
+        <input
+          id="soundAlerts"
+          type="checkbox"
+          checked>
+
+        <span>Ativar alertas sonoros</span>
+
+      </label>
+
+
+      <!-- ALERTAS DE VIBRAÇÃO -->
+
+      <label class="setting-check">
+
+        <input
+          id="vibrationAlerts"
+          type="checkbox"
+          checked>
+
+        <span>Ativar vibração (quando disponível)</span>
+
+      </label>
+
+
+      <button
+        id="saveSettings"
+        class="primary-button"
+        type="button">
+
+        Salvar configurações
+        <i class="fa-solid fa-check"></i>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL DE SAÍDA
+  ====================================================== -->
+
+  <div id="exitModal" class="modal hidden">
+
+    <div class="modal-card exit-modal-card">
+
+      <div class="modal-heading-icon warning-icon">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </div>
+
+      <h2>Deseja sair?</h2>
+
+      <p>
+        Ao sair, sua localização deixará de ser compartilhada
+        com a rede SYL.
+      </p>
+
+      <div class="modal-actions">
+
+        <button
+          id="cancelExit"
+          class="secondary-button"
+          type="button">
+
+          Continuar conectado
+
+        </button>
+
+        <button
+          id="confirmExit"
+          class="danger-button"
+          type="button">
+
+          <i class="fa-solid fa-power-off"></i>
+          Sair
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- NOTIFICAÇÕES -->
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+
+  <!-- =====================================================
+       BIBLIOTECAS E JAVASCRIPT
+  ====================================================== -->
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Ably -->
+  <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+
+  <!-- JavaScript principal -->
+  <script src="script.js"></script>
+
+</body>
+</html>
