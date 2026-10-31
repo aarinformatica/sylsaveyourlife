@@ -740,7 +740,45 @@
   ====================================================== -->
 
   <div id="settingsModal" class="modal hidden">
+<div class="settings-group notification-group">
+    <div class="notification-heading">
+        <i class="fa-solid fa-bell"></i>
+        <div>
+            <strong>Notificações do SYL</strong>
+            <small>Alertas diretamente no seu dispositivo</small>
+        </div>
+    </div>
 
+    <div class="notification-card">
+        <div class="notification-status-row">
+            <span>Status das notificações</span>
+            <span id="notificationStatus">Não ativadas</span>
+        </div>
+
+        <button
+            type="button"
+            id="enableNotifications"
+            class="notification-enable-button"
+        >
+            <i class="fa-solid fa-bell"></i>
+            Ativar notificações
+        </button>
+
+        <label class="setting-check">
+            <input
+                type="checkbox"
+                id="browserNotifications"
+                checked
+            >
+            <span>Receber alertas do SYL</span>
+        </label>
+
+        <p class="notification-description">
+            Receba avisos quando usuários entrarem na rede
+            ou estiverem próximos de você.
+        </p>
+    </div>
+</div>
     <div class="modal-card settings-card">
 
       <button
