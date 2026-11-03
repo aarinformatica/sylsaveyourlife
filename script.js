@@ -1,4 +1,3 @@
-
 "use strict";
 
 /* =========================================================
@@ -130,6 +129,11 @@ const state = {
   ownMarker: null,
   ownPosition: null,
   mapCentered: false,
+
+  // Rastreamento automático da posição do próprio usuário.
+  followUser: true,
+  lastFollowUpdate: 0,
+  followAnimationDuration: 0.65,
 
   remoteMarkers: new Map(),
   remoteUsers: new Map(),
@@ -780,6 +784,73 @@ function updateOwnMarker() {
 
   }
 
+
+  // Mantém o próprio marcador no centro durante o deslocamento.
+  // Os marcadores remotos nunca alteram a câmera do mapa.
+  followUserOnMap(position);
+
+}
+
+
+/* =========================================================
+   ACOMPANHAMENTO AUTOMÁTICO DO USUÁRIO
+========================================================= */
+
+function followUserOnMap(position, force = false) {
+
+  if (!state.map || !position) return;
+
+  if (!state.followUser && !force) return;
+
+
+  const latitude = Number(position[0]);
+  const longitude = Number(position[1]);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return;
+  }
+
+
+  const target = L.latLng(latitude, longitude);
+
+  const now = performance.now();
+
+
+  // Primeira localização: posiciona imediatamente, sem animação.
+  if (!state.mapCentered || force) {
+
+    state.map.setView(
+      target,
+      force ? Math.max(state.map.getZoom(), 17) : SYL_CONFIG.DEFAULT_ZOOM,
+      { animate: false }
+    );
+
+    state.mapCentered = true;
+    state.lastFollowUpdate = now;
+
+    return;
+
+  }
+
+
+  // Evita movimentações redundantes causadas por pequenas variações do GPS.
+  const currentCenter = state.map.getCenter();
+  const distance = currentCenter.distanceTo(target);
+
+  if (!force && distance < 1.5) return;
+
+
+  // panTo preserva o zoom e desloca o mapa suavemente para manter
+  // a posição GPS no centro da área visível.
+  state.map.panTo(target, {
+    animate: true,
+    duration: state.followAnimationDuration,
+    easeLinearity: 0.22,
+    noMoveStart: true
+  });
+
+  state.lastFollowUpdate = now;
+
 }
 
 
@@ -859,23 +930,6 @@ function startGeolocation() {
 
       publishPosition();
 
-
-      if (state.map && !state.mapCentered) {
-
-        state.map.setView(
-
-          [
-            coords.latitude,
-            coords.longitude
-          ],
-
-          SYL_CONFIG.DEFAULT_ZOOM
-
-        );
-
-        state.mapCentered = true;
-
-      }
 
 
       // Caso a pessoa esteja na aba do mapa,
@@ -960,20 +1014,26 @@ function centerOnUser() {
   }
 
 
+  // O botão também reativa o acompanhamento automático caso o usuário
+  // tenha deslocado o mapa manualmente.
+  state.followUser = true;
+
+  const target = [
+    state.ownPosition.latitude,
+    state.ownPosition.longitude
+  ];
+
   state.map.flyTo(
-
-    [
-      state.ownPosition.latitude,
-      state.ownPosition.longitude
-    ],
-
+    target,
     17,
-
-    { duration: 1.2 }
-
+    {
+      animate: true,
+      duration: 1.0,
+      easeLinearity: 0.22
+    }
   );
 
-
+  state.mapCentered = true;
   state.ownMarker?.openPopup();
 
 }
@@ -2348,8 +2408,6 @@ function loadSettings() {
   }
 
 }
-
-
 /* =========================================================
    TEMA
 ========================================================= */
@@ -2437,13 +2495,12 @@ function setMobileTab(tab) {
 
       if (state.ownPosition) {
 
-        state.map.panTo([
+        state.followUser = true;
 
+        followUserOnMap([
           state.ownPosition.latitude,
-
           state.ownPosition.longitude
-
-        ]);
+        ], true);
 
       }
 
@@ -2487,7 +2544,20 @@ function restoreMobileTab() {
 
     setTimeout(() => {
 
-      state.map?.invalidateSize(true);
+      if (!state.map) return;
+
+      state.map.invalidateSize(true);
+
+      if (state.ownPosition) {
+
+        state.followUser = true;
+
+        followUserOnMap([
+          state.ownPosition.latitude,
+          state.ownPosition.longitude
+        ], true);
+
+      }
 
     }, 200);
 
@@ -2723,6 +2793,9 @@ function resetApplication() {
 
   state.mapCentered = false;
 
+  state.followUser = true;
+  state.lastFollowUpdate = 0;
+
   state.exiting = false;
 
 
@@ -2922,6 +2995,8 @@ function escapeHTML(value) {
   });
 
 }
+
+
 /* =========================================================
    SYL — NOTIFICAÇÕES NATIVAS DO NAVEGADOR
 ========================================================= */
